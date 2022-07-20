@@ -22,7 +22,9 @@ const { getHospitales, actualizarHospital, borrarHospital, crearHospital } = req
  ], crearHospital );
  
  router.put('/:id', [
-    validarJWT
+    validarJWT,
+    check('nombre', 'El nombre del hospital es necesario').not().isEmpty(),
+    validarCampos
  ], actualizarHospital );
  
  

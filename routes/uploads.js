@@ -19,9 +19,7 @@ router.put('/:tipo/:id', [
 ], fileUpload );
 
 
-router.get('/:tipo/:foto', [
-    validarJWT
-], retornaImagen )
+router.get('/:tipo/:foto' , retornaImagen )
  
 
 module.exports = router;

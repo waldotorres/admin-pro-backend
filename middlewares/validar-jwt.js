@@ -1,5 +1,7 @@
 const { response } = require("express");
 const jwt = require("jsonwebtoken");
+const usuario= require('../models/usuario');
+
 
 const validarJWT = (req, res = response, next)=>{
     //Leer token
@@ -28,6 +30,99 @@ const validarJWT = (req, res = response, next)=>{
     
 }
 
+
+const validarAdminRole = async (req, res, next)=>{
+
+    const uid = req.uid;
+
+
+    try {
+        
+        const usuarioDB = await usuario.findById(uid);
+        
+        if(!usuarioDB){
+          return  res.status(404).json({
+                ok:false,
+                msg:'Usuario no existe'
+            })
+        }
+
+        if(usuarioDB.role !== 'ADMIN_ROLE'){
+
+            return res.status(403).json({
+                ok:false,
+                msg:'Usuario no es administrador'
+            })
+        }
+
+
+        next();
+
+    } catch (error) {
+        
+        console.log(error);
+
+        res.status(500).json({
+            ok:false, 
+            msg:'Hable con el administrador'
+        })
+
+    }
+
+}
+
+
+const validarAdminRole_MismoUsuario = async (req, res, next)=>{
+
+    const id = req.params.id;
+    const uid = req.uid;
+
+    console.log(uid);
+    console.log(id)
+
+    try {
+        
+        const usuarioDB = await usuario.findById(uid);
+        
+        if(!usuarioDB){
+          return  res.status(404).json({
+                ok:false,
+                msg:'Usuario no existe'
+            })
+        }
+
+
+
+        if( usuarioDB.role === 'ADMIN_ROLE' || uid === id ){
+
+            next();
+
+        }
+        else{
+            return res.status(403).json({
+                ok:false,
+                msg:'Usuario no es administrador'
+            })
+        }
+
+
+
+
+    } catch (error) {
+        
+        console.log(error);
+
+        res.status(500).json({
+            ok:false, 
+            msg:'Hable con el administrador'
+        })
+
+    }
+
+}
+
 module.exports = {
-    validarJWT
+    validarJWT,
+    validarAdminRole,
+    validarAdminRole_MismoUsuario
 }
